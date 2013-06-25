@@ -23,24 +23,22 @@ function PortfolioListCtrl($scope, Portfolio) {
     $scope.portfolios = Portfolio.query();
 }
 
-function PortfolioDetailCtrl($scope, $routeParams, Portfolio) {
+function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSecurity) {
 
     var isSecurityInPortfolio = function (symbol) {
         return _.findWhere($scope.portfolio.securities, {symbol: symbol});
     };
 
-    $scope.addSecurity = function () {
-        var quote = $scope.searchResult;
-        if (quote) {
-            var newSecurity = {symbol: quote.symbol};
+    $scope.addSecurity = function (symbol) {
+        if (symbol) {
+            var newSecurity = {symbol: symbol};
             if (!isSecurityInPortfolio(newSecurity)) {
-                if ($scope.portfolio.securities) {
-                    $scope.portfolio.securities.push(newSecurity);
-                } else {
-                    $scope.portfolio.securities = [newSecurity];
-                }
-                $scope.portfolio.$save($routeParams, function (portfolio) {
-                    $scope.portfolio = portfolio;
+                newSecurity = new PortfolioSecurity({portfolioId: $routeParams.portfolioId, symbol: symbol});
+                newSecurity.$save(function (security) {
+                    if (!$scope.portfolio.securities) {
+                        $scope.portfolio.securities = [];
+                    }
+                    $scope.portfolio.securities.push(security);
                     $scope.searchResult = undefined;
                 });
             }
@@ -49,11 +47,10 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio) {
 
     $scope.removeSecurity = function (symbol) {
         if (confirm('Remove this security? There is no undo...')) {
-            console.log(symbol);
             var securityToDelete = _.findWhere($scope.portfolio.securities, {symbol: symbol});
             if (securityToDelete) {
+                PortfolioSecurity.delete({portfolioId: $routeParams.portfolioId, symbol: symbol});
                 $scope.portfolio.securities.splice($scope.portfolio.securities.indexOf(securityToDelete), 1);
-                $scope.portfolio.$save($routeParams);
             }
         }
     };
@@ -67,7 +64,7 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio) {
             if (isSecurityInPortfolio(symbol)) {
                 $scope.searchInfo = 'Silly trader! ' + symbol + ' is already in this portfolio.';
             } else {
-                StockTrader.quote.get({symbol: symbol}, function (quote) {
+                Quote.get({symbol: symbol}, function (quote) {
                     $scope.searchResult = quote;
                 }, function (response) {
                     if (response.status == 404) {

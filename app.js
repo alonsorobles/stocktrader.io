@@ -6,7 +6,8 @@ var express = require('express')
     , routes = require('./routes')
     , http = require('http')
     , path = require('path')
-    , stocktrader = require('./lib/stocktrader.js');
+    , portfolioService = require('./lib/portfolio_service.js')()
+    , quoteService = require('./lib/quote_service.js')();
 
 var app = express();
 
@@ -28,10 +29,13 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-stocktrader(app);
+portfolioService.registerRoutes(app);
+quoteService.registerRoutes(app);
 
 app.get('/', routes.index);
 
 http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
+
+setInterval(quoteService.updateQuotes, 1000*60*10);
