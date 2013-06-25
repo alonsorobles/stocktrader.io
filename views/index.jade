@@ -1,4 +1,32 @@
-extends layout
+doctype 5
+html(lang='en', ng-app='stockTrader')
+    head
+        title stocktrader.io
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
+        link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+        link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.css')
+        link(rel='stylesheet', href="/stylesheets/app.css" )
+    body
+        .navbar.navbar-inverse.navbar-fixed-top
+            .navbar-inner
+                .container
+                    button.btn.btn-navbar(type='button', data-toggle='collapse', data-target='.nav-collapse')
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a.brand(href='/') stocktrader.io
+                    .nav-collapse.collapse
+                        ul.nav
+                            li.active
+                                a(href='/') Home
 
-block content
-    include index.html
+        ng-view
+
+        script(src='/javascripts/vendor/underscore.js')
+        script(src='/javascripts/vendor/angular.js')
+        script(src='/javascripts/vendor/angular-resource.js')
+        script(src='/javascripts/stocktrader.io/ng-bootstrap.js')
+        script(src='/javascripts/stocktrader.io/app.js')
+        script(src='/javascripts/stocktrader.io/controllers.js')
+        script(src='/javascripts/stocktrader.io/services.js')
+

@@ -1,0 +1,48 @@
+<div class="container">
+    <div class="row">
+        <div class="span3">
+            <form class="form-search form-inline">
+                <div class="input-append"><label>
+                    <input type="text" ng-model="searchSymbol" placeholder="Symbol"
+                           class="input-medium search-query">
+                </label>
+                    <button type="button" ng-click="doSymbolSearch()" class="btn"><i class="icon-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <div ng-show="searchResult" class="span9"><strong>{{searchResult.name}} &nbsp;</strong><span class="muted">({{searchResult.exchange}}:{{searchResult.symbol}}) &nbsp;</span>
+            <add-button text="Add" action="addSecurity()"></add-button>
+        </div>
+        <div ng-show="searchInfo" class="span9"><p class="text-info">{{searchInfo}}</p></div>
+        <div ng-show="searchError" class="span9"><p class="text-error">{{searchError}}</p></div>
+    </div>
+    <div class="row">
+        <div class="span12">
+            <table ng-show="portfolio.securities" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Symbol</th>
+                    <th>Last Price</th>
+                    <th>Trend</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="security in holdings | orderBy:sort">
+                    <td><a href="#/{{security.details}}" ng-click="stopRefresh()">{{security.name}}</a></td>
+                    <td><a href="#/{{security.details}}" ng-click="stopRefresh()">{{security.symbol}}</a></td>
+                    <td>{{security.lastPrice | currency}}</td>
+                    <td><span ng-show="security.trendUp" class="badge badge-success"><i
+                            class="icon-arrow-up icon-white"></i></span><span ng-show="security.trendDown"
+                                                                              class="badge badge-important"><i
+                            class="icon-arrow-down icon-white"></i></span></td>
+                    <td>
+                        <delete-button text="Remove" action="removeSecurity(security.symbol)"></delete-button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
