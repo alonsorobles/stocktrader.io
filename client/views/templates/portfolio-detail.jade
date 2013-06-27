@@ -1,0 +1,47 @@
+.container
+    .row
+        .span3
+            form.form-search.form-inline
+                .input-append
+                    label
+                        input.input-medium.search-query(type='text', ng-model='searchSymbol', placeholder='Symbol')
+                    button.btn(type='button', ng-click='doSymbolSearch()')
+                        i.icon-search
+        .span9(ng-show='searchResult')
+            strong {{searchResult.name}} &nbsp;
+                span.muted ({{searchResult.exchange}}:{{searchResult.symbol}}) &nbsp;
+            button.btn.btn-success(ng-click='addSecurity(searchResult.symbol)')
+                i.icon-plus.icon-white
+                | &nbsp;Add to Portfolio
+        .span9(ng-show='searchInfo')
+            p.text-info {{searchInfo}}
+        .span9(ng-show='searchError')
+            p.text-error {{searchError}}
+    .row
+        .span12
+            table.table.table-hover(ng-show='portfolio.securities')
+                thead
+                    tr
+                        th Name
+                        th Symbol
+                        th Last Price
+                        th Change
+                        th Trend
+                        th
+                tbody
+                    tr(ng-repeat='security in portfolio.securities | orderBy:sort')
+                        td {{security.name}}
+                        td {{security.symbol}}
+                        td {{security.lastPrice | currency}}
+                        td
+                            span.text-success(ng-show='security.changeUp') +{{security.changeAmount | number:2}} ({{security.changePercentage | number:2}}%)
+                            span.text-error(ng-show='security.changeDown') -{{security.changeAmount | number:2}} ({{security.changePercentage | number:2}}%)
+                        td
+                            span.badge.badge-success(ng-show='security.trendUp')
+                                i.icon-arrow-up.icon-white
+                            span.badge.badge-important(ng-show='security.trendDown')                                              
+                                i.icon-arrow-down.icon-white
+                        td
+                            button.btn.btn-danger.btn-small(ng-click='removeSecurity(security.symbol)')
+                                i.icon-remove.icon-white
+                    

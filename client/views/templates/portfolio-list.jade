@@ -1,0 +1,18 @@
+.container
+    .row
+        .span9
+            table.table.table-hover
+                tbody
+                    tr(ng-repeat='portfolio in portfolios | orderBy:orderBy')
+                        td
+                            h4
+                                a(href='#/portfolio/{{portfolio._id}}') {{portfolio.name}}
+                        td
+                            button.btn.btn-danger(ng-click='removePortfolio(portfolio)')
+                                i.icon-remove.icon-white
+        .span3
+            label
+                input(type='text', ng-model='newPortfolioName')
+            button.btn.btn-success(ng-click='addPortfolio(newPortfolioName)')
+                i.icon-plus.icon-white
+                | &nbsp;Create Portfolio
