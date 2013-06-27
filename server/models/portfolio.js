@@ -44,9 +44,18 @@ var update = function (portfolio, callback) {
     });
 };
 
+var remove = function (portfolio, callback) {
+    client.connect(function (db) {
+        db.collection(collectionName).remove({_id: portfolio._id}, function (err) {
+            callback(err);
+        })
+    });
+};
+
 module.exports = {
     findAll: findAll,
     create: create,
     findById: findById,
-    update: update
+    update: update,
+    remove: remove
 };

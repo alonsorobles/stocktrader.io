@@ -34,25 +34,52 @@ var show = function (req, res) {
     });
 };
 
+var destroy = function (req, res) {
+    Portfolio.findById(req.params.portfolioId, function (err, portfolio) {
+        if (!portfolio) {
+            res.statusCode = 404;
+            res.end();
+        } else {
+            Portfolio.remove(portfolio, function (err) {
+                if (err) throw(err);
+                res.statusCode = 200;
+                res.end();
+            });
+        }
+    });
+};
+
+var basePath = '/api/portfolio';
+
 var routes = [
     {
-        path: '/api/portfolio',
+        path: basePath,
         httpMethod: 'GET',
         middleWare: [index]
     },
     {
-        path: '/api/portfolio',
+        path: basePath,
         httpMethod: 'POST',
         middleWare: [create]
     },
     {
-        path: '/api/portfolio/:portfolioId',
+        path: basePath + '/:portfolioId',
         httpMethod: 'GET',
         middleWare: [show]
+    },
+    {
+        path: basePath + '/:portfolioId',
+        httpMethod: 'DELETE',
+        middleWare: [destroy]
     }
 ];
 
 module.exports = {
     routes: routes,
-    index: index
+    actions: {
+        index: index,
+        create: create,
+        show: show,
+        destroy: destroy
+    }
 };
