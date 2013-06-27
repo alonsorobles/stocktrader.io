@@ -6,9 +6,9 @@ var _ = require('underscore')._,
 
 var collectionName = 'portfolios';
 
-var findAll = function (query, callback) {
+var findAll = function (callback) {
     client.connect(function (db) {
-        db.collection(collectionName).find(query, {'name': true}).toArray(function (err, portfolios) {
+        db.collection(collectionName).find({}, {'name': true}).toArray(function (err, portfolios) {
             callback(err, portfolios);
         });
     });
@@ -31,14 +31,15 @@ var create = function (name, callback) {
 var findById = function (id, callback) {
     client.connect(function (db) {
         db.collection(collectionName).findOne({_id: client.ObjectID(id)}, function (err, portfolio) {
-            if (!err && portfolio) {
-                Quote.findBySymbols(_.pluck(portfolio.securities, 'symbol'), function (err, securites) {
-                    portfolio.securities = securites;
-                    callback(err, portfolio);
-                });
-            } else {
-                callback(err, portfolio);
-            }
+            callback(err, portfolio);
+        });
+    });
+};
+
+var update = function (portfolio, callback) {
+    client.connect(function (db) {
+        db.collection(collectionName).save(portfolio, function (err, portfolio) {
+            callback(err, portfolio);
         });
     });
 };
@@ -46,5 +47,6 @@ var findById = function (id, callback) {
 module.exports = {
     findAll: findAll,
     create: create,
-    findById: findById
+    findById: findById,
+    update: update
 };

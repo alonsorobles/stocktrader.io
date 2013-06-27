@@ -3,7 +3,8 @@
 var _ = require('underscore'),
     path = require('path'),
     PortfolioCtrl = require('./controllers/portfolio'),
-    QuoteCrtl = require('./controllers/quote');
+    PortfolioSecurityCtrl = require('./controllers/portfolioSecurity'),
+    QuoteCtrl = require('./controllers/quote');
 
 var routes = [
     {
@@ -49,6 +50,7 @@ var registerRoutes = function (app, routes) {
 
 module.exports = function (app) {
     registerRoutes(app, PortfolioCtrl.routes);
-    registerRoutes(app, QuoteCrtl.routes);
+    registerRoutes(app, PortfolioSecurityCtrl.routes);
+    registerRoutes(app, QuoteCtrl.routes);
     registerRoutes(app, routes);
 };

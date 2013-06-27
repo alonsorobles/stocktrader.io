@@ -4,7 +4,7 @@ var _ = require('underscore')._,
     Quote = require('../models/quote'),
     YahooFinance = require('./yahooFinance');
 
-var delay = 1000 * 60;
+var delay = 1000 * 60 * 30;
 
 var refresh = function () {
     console.log('Quote refresh invoked!');
