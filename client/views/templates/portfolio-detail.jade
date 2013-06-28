@@ -19,7 +19,7 @@
             p.text-error {{searchError}}
     .row
         .span12
-            table.table.table-hover(ng-show='portfolio.securities')
+            table.table.table-hover(ng-show='securities')
                 thead
                     tr
                         th Name
@@ -29,18 +29,15 @@
                         th Trend
                         th
                 tbody
-                    tr(ng-repeat='security in portfolio.securities | orderBy:sort')
+                    tr(ng-repeat="security in portfolio.securities | orderBy:'name'")
                         td {{security.name}}
                         td {{security.symbol}}
                         td {{security.lastPrice | currency}}
                         td
-                            span.text-success(ng-show='security.changeUp') +{{security.changeAmount | number:2}} ({{security.changePercentage | number:2}}%)
-                            span.text-error(ng-show='security.changeDown') -{{security.changeAmount | number:2}} ({{security.changePercentage | number:2}}%)
+                            span(ng-class='security.changeClass') {{security.changePrefix}}{{security.change | number:2}} ({{security.changePercentage | number:2}}%)
                         td
-                            span.badge.badge-success(ng-show='security.trendUp')
-                                i.icon-arrow-up.icon-white
-                            span.badge.badge-important(ng-show='security.trendDown')                                              
-                                i.icon-arrow-down.icon-white
+                            span.badge(ng-class='security.trendClass')
+                                i.icon-white(ng-class='security.trendIcon')
                         td
                             button.btn.btn-danger.btn-small(ng-click='removeSecurity(security.symbol)')
                                 i.icon-remove.icon-white

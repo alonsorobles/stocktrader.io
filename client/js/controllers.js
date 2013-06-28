@@ -80,5 +80,27 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSe
 
     Portfolio.get($routeParams, function (portfolio) {
         $scope.portfolio = portfolio;
+        $scope.securities = [];
+        _.each($scope.portfolio.securities, function (security) {
+            security.change = security.lastPrice - security.previousClose;
+            if (security.change > 0) {
+                security.changeClass = 'text-success';
+                security.changePrefix = '+';
+            } else if (security.change < 0) {
+                security.changeClass = 'text-error';
+            }
+            security.changePercentage = (Math.abs(security.change) / security.previousClose) * 100;
+            if (security.yahooFinanceMovingAverage.d50 < security.yahooFinanceMovingAverage.d200) {
+                security.trendClass = 'badge-important';
+                security.trendIcon = 'icon-arrow-down';
+            } else if (security.yahooFinanceMovingAverage.d50 > security.yahooFinanceMovingAverage.d200) {
+                security.trendClass = 'badge-success';
+                security.trendIcon = 'icon-arrow-up';
+            } else {
+                security.trendIcon = 'icon-arrow-left icon-arrow-right';
+            }
+
+            $scope.securities.push(security);
+        });
     });
 }
