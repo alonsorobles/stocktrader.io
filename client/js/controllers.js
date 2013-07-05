@@ -29,16 +29,41 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSe
         return _.findWhere($scope.portfolio.securities, {symbol: symbol});
     };
 
+    function calculateTrends(security) {
+        security.change = security.lastPrice - security.previousClose;
+        if (security.change > 0) {
+            security.changeClass = 'text-success';
+            security.changePrefix = '+';
+        } else if (security.change < 0) {
+            security.changeClass = 'text-error';
+        }
+        security.changePercentage = (Math.abs(security.change) / security.previousClose) * 100;
+        if (security.yahooFinanceMovingAverage.d50 < security.yahooFinanceMovingAverage.d200) {
+            security.trendClass = 'badge-important';
+            security.trendIcon = 'icon-arrow-down';
+        } else if (security.yahooFinanceMovingAverage.d50 > security.yahooFinanceMovingAverage.d200) {
+            security.trendClass = 'badge-success';
+            security.trendIcon = 'icon-arrow-up';
+        } else {
+            security.trendIcon = 'icon-minus';
+        }
+        return security;
+    }
+
     $scope.addSecurity = function (symbol) {
         if (symbol) {
             var newSecurity = {symbol: symbol};
             if (!isSecurityInPortfolio(newSecurity)) {
                 newSecurity = new PortfolioSecurity({portfolioId: $routeParams.portfolioId, symbol: symbol});
                 newSecurity.$save(function (security) {
-                    if (!$scope.portfolio.securities) {
+                    var calculatedSecurity = calculateTrends(security);
+                    $scope.securities.push(calculatedSecurity);
+
+                    if ($scope.portfolio.securities) {
                         $scope.portfolio.securities = [];
                     }
-                    $scope.portfolio.securities.push(security);
+                    $scope.portfolio.securities.push(calculatedSecurity);
+
                     $scope.searchResult = undefined;
                 });
             }
@@ -51,6 +76,7 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSe
             if (securityToDelete) {
                 PortfolioSecurity.delete({portfolioId: $routeParams.portfolioId, symbol: symbol});
                 $scope.portfolio.securities.splice($scope.portfolio.securities.indexOf(securityToDelete), 1);
+                $scope.securities.splice($scope.portfolio.securities.indexOf(securityToDelete), 1);
             }
         }
     };
@@ -67,7 +93,7 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSe
                 Quote.get({symbol: symbol}, function (quote) {
                     $scope.searchResult = quote;
                 }, function (response) {
-                    if (response.status == 404) {
+                    if (response.status === 404) {
                         $scope.searchError = 'We searched and searched... but alas, we could not find ' + symbol + '.';
                     }
                 });
@@ -82,25 +108,7 @@ function PortfolioDetailCtrl($scope, $routeParams, Portfolio, Quote, PortfolioSe
         $scope.portfolio = portfolio;
         $scope.securities = [];
         _.each($scope.portfolio.securities, function (security) {
-            security.change = security.lastPrice - security.previousClose;
-            if (security.change > 0) {
-                security.changeClass = 'text-success';
-                security.changePrefix = '+';
-            } else if (security.change < 0) {
-                security.changeClass = 'text-error';
-            }
-            security.changePercentage = (Math.abs(security.change) / security.previousClose) * 100;
-            if (security.yahooFinanceMovingAverage.d50 < security.yahooFinanceMovingAverage.d200) {
-                security.trendClass = 'badge-important';
-                security.trendIcon = 'icon-arrow-down';
-            } else if (security.yahooFinanceMovingAverage.d50 > security.yahooFinanceMovingAverage.d200) {
-                security.trendClass = 'badge-success';
-                security.trendIcon = 'icon-arrow-up';
-            } else {
-                security.trendIcon = 'icon-arrow-left icon-arrow-right';
-            }
-
-            $scope.securities.push(security);
+            $scope.securities.push(calculateTrends(security));
         });
     });
 }

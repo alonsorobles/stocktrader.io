@@ -2,9 +2,11 @@
 
 var _ = require('underscore')._,
     Portfolio = require('../models/portfolio'),
-    Quote = require('../models/quote.js');
+    Quote = require('../models/quote.js'),
+    basePath = '/api/portfolio/:portfolioId/security',
+    routes;
 
-var create = function (req, res) {
+function create(req, res) {
     var symbol = req.body.symbol;
     if (!symbol) {
         res.statusCode = 400;
@@ -18,12 +20,13 @@ var create = function (req, res) {
             } else {
                 symbol = symbol.toLocaleUpperCase();
                 Quote.findById(symbol, function (err, quote) {
+                    var security;
                     if (err) throw (err);
                     if (!quote) {
                         res.statusCode = 404;
                         res.end();
                     } else {
-                        var security = _.findWhere(portfolio.securities, {symbol: symbol});
+                        security = _.findWhere(portfolio.securities, {symbol: symbol});
                         if (!security) {
                             if (!portfolio.securities) portfolio.securities = [];
                             portfolio.securities.push({symbol: symbol});
@@ -39,16 +42,17 @@ var create = function (req, res) {
             }
         });
     }
-};
+}
 
-var destroy = function (req, res) {
+function destroy(req, res) {
     Portfolio.findById(req.params.portfolioId, function (err, portfolio) {
+        var security;
         if (err) throw (err);
         if (!portfolio) {
             res.statusCode = 404;
             res.end();
         } else {
-            var security = {symbol: req.params.symbol};
+            security = {symbol: req.params.symbol};
             if (portfolio.securities) {
                 portfolio.securities.splice(portfolio.securities.indexOf(security), 1);
             }
@@ -59,11 +63,9 @@ var destroy = function (req, res) {
             });
         }
     });
-};
+}
 
-var basePath = '/api/portfolio/:portfolioId/security';
-
-var routes = [
+routes = [
     {
         path: basePath,
         httpMethod: 'POST',

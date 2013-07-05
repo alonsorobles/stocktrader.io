@@ -11,12 +11,12 @@ var Db = require('mongodb').Db,
     Code = require('mongodb').Code,
     BSON = require('mongodb').pure().BSON;
 
-var connect = function (callback) {
+function connect(callback) {
     MongoClient.connect('mongodb://localhost/stocktrader?w=1', function (err, db) {
         if (err) console.error(err);
         callback(db);
     });
-};
+}
 
 module.exports = {
     connect: connect,

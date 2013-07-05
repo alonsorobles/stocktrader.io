@@ -4,9 +4,10 @@ var _ = require('underscore'),
     path = require('path'),
     PortfolioCtrl = require('./controllers/portfolio'),
     PortfolioSecurityCtrl = require('./controllers/portfolioSecurity'),
-    QuoteCtrl = require('./controllers/quote');
+    QuoteCtrl = require('./controllers/quote'),
+    routes;
 
-var routes = [
+routes = [
     {
         path: '/templates/*',
         httpMethod: 'GET',
@@ -16,7 +17,7 @@ var routes = [
         }]
     },
     {
-        path: '/',
+        path: '/*',
         httpMethod: 'GET',
         middleWare: [ function (req, res) {
             res.render('index');
@@ -24,7 +25,7 @@ var routes = [
     }
 ];
 
-var registerRoutes = function (app, routes) {
+function registerRoutes(app, routes) {
     _.each(routes, function (route) {
         var args = _.flatten([route.path, route.middleWare], false);
 
@@ -46,7 +47,7 @@ var registerRoutes = function (app, routes) {
                 break;
         }
     });
-};
+}
 
 module.exports = function (app) {
     registerRoutes(app, PortfolioCtrl.routes);

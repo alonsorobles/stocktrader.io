@@ -2,19 +2,19 @@
 
 var _ = require('underscore')._,
     client = require('../lib/mongoClient'),
-    Quote = require('./quote');
+    Quote = require('./quote'),
+    collectionName = 'portfolios';
 
-var collectionName = 'portfolios';
-
-var findAll = function (callback) {
+function findAll(callback) {
     client.connect(function (db) {
         db.collection(collectionName).find({}, {'name': true}).toArray(function (err, portfolios) {
             callback(err, portfolios);
+            db.close();
         });
     });
-};
+}
 
-var create = function (name, callback) {
+function create(name, callback) {
     if (!name) {
         callback('Missing portfolio name');
     } else {
@@ -23,34 +23,38 @@ var create = function (name, callback) {
                 var portfolio;
                 if (result) portfolio = result[0];
                 callback(err, portfolio);
+                db.close();
             });
         });
     }
-};
+}
 
-var findById = function (id, callback) {
+function findById(id, callback) {
     client.connect(function (db) {
         db.collection(collectionName).findOne({_id: client.ObjectID(id)}, function (err, portfolio) {
             callback(err, portfolio);
+            db.close();
         });
     });
-};
+}
 
-var update = function (portfolio, callback) {
+function update(portfolio, callback) {
     client.connect(function (db) {
         db.collection(collectionName).save(portfolio, function (err, portfolio) {
             callback(err, portfolio);
+            db.close();
         });
     });
-};
+}
 
-var remove = function (portfolio, callback) {
+function remove(portfolio, callback) {
     client.connect(function (db) {
         db.collection(collectionName).remove({_id: portfolio._id}, function (err) {
             callback(err);
+            db.close();
         })
     });
-};
+}
 
 module.exports = {
     findAll: findAll,

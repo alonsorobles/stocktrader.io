@@ -2,29 +2,39 @@
 
 var _ = require('underscore')._,
     Portfolio = require('../models/portfolio.js'),
-    Quote = require('../models/quote.js');
+    Quote = require('../models/quote.js'),
+    basePath = '/api/portfolio',
+    routes;
 
 var index = function (req, res) {
     Portfolio.findAll(function (err, portfolios) {
-        if (err) throw(err);
+        if (err) {
+            throw err;
+        }
         res.json(portfolios);
     });
 };
 
-var create = function (req, res) {
+function create(req, res) {
     Portfolio.create(req.body.name, function (err, portfolio) {
-        if (err) throw(err);
+        if (err) {
+            throw err;
+        }
         res.json(portfolio);
     });
-};
+}
 
-var show = function (req, res) {
+function show(req, res) {
     Portfolio.findById(req.params.portfolioId, function (err, portfolio) {
-        if (err) throw(err);
+        if (err) {
+            throw err;
+        }
         if (portfolio) {
-            Quote.findBySymbols(_.pluck(portfolio.securities, 'symbol'), function (err, securites) {
-                if (err) throw(err);
-                portfolio.securities = securites;
+            Quote.findBySymbols(_.pluck(portfolio.securities, 'symbol'), function (err, securities) {
+                if (err) {
+                    throw err;
+                }
+                portfolio.securities = securities;
                 res.json(portfolio);
             });
         } else {
@@ -32,26 +42,26 @@ var show = function (req, res) {
             res.end();
         }
     });
-};
+}
 
-var destroy = function (req, res) {
+function destroy(req, res) {
     Portfolio.findById(req.params.portfolioId, function (err, portfolio) {
         if (!portfolio) {
             res.statusCode = 404;
             res.end();
         } else {
             Portfolio.remove(portfolio, function (err) {
-                if (err) throw(err);
+                if (err) {
+                    throw err;
+                }
                 res.statusCode = 200;
                 res.end();
             });
         }
     });
-};
+}
 
-var basePath = '/api/portfolio';
-
-var routes = [
+routes = [
     {
         path: basePath,
         httpMethod: 'GET',

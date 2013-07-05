@@ -1,10 +1,13 @@
 'use strict';
 
-var Quote = require('../models/quote');
+var Quote = require('../models/quote'),
+    routes;
 
-var show = function (req, res) {
+function show(req, res) {
     Quote.findById(req.params.symbol, function (err, quote) {
-        if (err) throw(err);
+        if (err) {
+            throw err;
+        }
         if (quote) {
             res.json(quote);
         } else {
@@ -12,9 +15,9 @@ var show = function (req, res) {
             res.end();
         }
     });
-};
+}
 
-var routes = [
+routes = [
     {
         path: '/api/quote/:symbol',
         httpMethod: 'GET',

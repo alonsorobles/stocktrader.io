@@ -3,21 +3,24 @@
 var csv = require('csv'),
     http = require('http');
 
-var get = function (symbols, callback) {
-    http.get('http://download.finance.yahoo.com/d/quotes.csv?s=' + symbols.join('+') + '&f=d1l1ophgm3m4xsne1',function (yahoo) {
+function get(symbols, callback) {
+    var yahooUrl = 'http://download.finance.yahoo.com/d/quotes.csv?s=' + symbols.join('+') + '&f=d1l1ophgm3m4xsne1';
+    console.log("Requesting data from: " + yahooUrl);
+    http.get(yahooUrl, function (yahoo) {
         yahoo.setEncoding('utf8');
-        var quotes = [];
-        var error;
+        var quotes = [],
+            error;
         yahoo.on('data', function (chunk) {
             csv()
                 .from(chunk)
                 .transform(function (row) {
-                    var tradeDate = new Date(row[0]);
-                    if (row[11] && row[11].toUpperCase() != 'N/A') {
+                    var tradeDate = new Date(row[0]),
+                        quote;
+                    if (row[11] && row[11].toUpperCase() !== 'N/A') {
                         console.warn('Yahoo! Finance Quote Error for ' + row[9] + ': ' + row[11]);
                     }
                     if (tradeDate) {
-                        var quote = {
+                        quote = {
                             lastTradeDate: new Date(tradeDate.getFullYear(), tradeDate.getMonth(), tradeDate.getDate(), 0, 0, 0, 0),
                             lastPrice: row[1],
                             open: row[2],
@@ -38,13 +41,14 @@ var get = function (symbols, callback) {
                 })
                 .on('error', function (err) {
                     error = err;
-                    console.log('Yahoo! Finance CSV Error: ' + err.message);
+                    console.error('Yahoo! Finance CSV Error: ' + err.message);
                 });
         });
-    }).on('error', function (err) {
+    })
+        .on('error', function (err) {
             callback(err);
         });
-};
+}
 
 module.exports = {
     get: get

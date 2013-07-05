@@ -19,7 +19,7 @@
             p.text-error {{searchError}}
     .row
         .span12
-            table.table.table-hover(ng-show='securities')
+            table.table.table-hover.table-striped.table-condensed(ng-show='portfolio.securities')
                 thead
                     tr
                         th Name
@@ -29,7 +29,7 @@
                         th Trend
                         th
                 tbody
-                    tr(ng-repeat="security in portfolio.securities | orderBy:'name'")
+                    tr(ng-repeat="security in securities | orderBy:'name'")
                         td {{security.name}}
                         td {{security.symbol}}
                         td {{security.lastPrice | currency}}
